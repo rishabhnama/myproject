@@ -1,0 +1,23 @@
+FROM node:17-alpine AS BUILD
+
+WORKDIR /var/crudapp
+
+COPY ./package.json ./
+
+RUN npm install 
+
+RUN npm i -g react-scripts
+
+COPY . .
+
+RUN npm run build
+
+FROM nginx:stable-alpine
+
+RUN cd /usr/share/nginx/html
+
+COPY --from=build /var/crudapp/build /usr/share/nginx/html
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
